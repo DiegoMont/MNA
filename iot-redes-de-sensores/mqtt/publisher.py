@@ -1,4 +1,6 @@
+import random
 import time
+
 import paho.mqtt.client as mqtt
 
 import mqtt_utils
@@ -10,8 +12,9 @@ client.connect(mqtt_utils.BROKER_ADDRESS, mqtt_utils.BROKER_PORT)
 client.loop_start()
 while True:
     try:
-        client.publish(mqtt_utils.TOPIC_1, "hola", qos=0)
-        time.sleep(5)
+        temp = random.randint(25, 30)
+        client.publish(mqtt_utils.TOPIC_DIEGO, temp, qos=0)
+        time.sleep(10)
     except KeyboardInterrupt:
         client.disconnect()
         client.loop_stop()
