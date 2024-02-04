@@ -6,8 +6,10 @@ import time
 
 
 def count_words(filename: str) -> str:
-    WORD_COUNTS = ""
-    counter = dict()
+    """Counts unique lines in file
+    """
+    word_counts = ""
+    counter = {}
     with open(filename, encoding="utf-8") as file:
         for line in file:
             phrase = line.strip()
@@ -17,9 +19,9 @@ def count_words(filename: str) -> str:
         grand_total = 0
         for word, count in counter.items():
             grand_total += count
-            WORD_COUNTS += f"{word}    {count}\n"
-        WORD_COUNTS += f"Grand Total {grand_total}\n"
-    return WORD_COUNTS
+            word_counts += f"{word}    {count}\n"
+        word_counts += f"Grand Total {grand_total}\n"
+    return word_counts
 
 
 if __name__ == "__main__":

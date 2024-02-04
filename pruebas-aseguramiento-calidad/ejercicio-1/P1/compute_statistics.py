@@ -33,7 +33,10 @@ class Counter:
     def get_most_common(self) -> float | None:
         """Gets the number that appeared the most.
         """
-        most_common_elements = sorted(self.__elements.items(), key=lambda item: item[1], reverse=True)
+        most_common_elements = sorted(
+            self.__elements.items(),
+            key=lambda item: item[1],
+            reverse=True)
         if most_common_elements[0][1] == 1:
             return None
         return self.__mode
