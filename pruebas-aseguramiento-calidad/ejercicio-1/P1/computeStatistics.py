@@ -10,7 +10,7 @@ def calculate_variance(sample: list, sample_mean: float) -> float:
     e = 0
     for xi in sample:
         e += (xi - sample_mean) ** 2
-    return e / len(sample)
+    return e / (len(sample) - 1)
 
 class Counter:
     """Class that counts how many ocurrences of elements have appeared.
@@ -33,6 +33,9 @@ class Counter:
     def get_most_common(self) -> float | None:
         """Gets the number that appeared the most.
         """
+        most_common_elements = sorted(self.__elements.items(), key=lambda item: item[1], reverse=True)
+        if most_common_elements[0][1] == 1:
+            return None
         return self.__mode
 
 
@@ -64,7 +67,7 @@ if __name__ == "__main__":
     variance = calculate_variance(numbers, MEAN)
     std_deviation = variance ** 0.5
     elapsed_time = time.time() - start
-    count_report = f"COUNT: {NUMBER_COUNT:10.3f}\n"
+    count_report = f"COUNT: {NUMBER_COUNT}\n"
     mean_report = f"MEAN: {MEAN:10.3f}\n"
     median_report = f"MEDIAN: {median:10.3f}\n"
     MODE_REPORT = "MODE: " + ("N/A" if mode is None else str(mode)) + "\n"
