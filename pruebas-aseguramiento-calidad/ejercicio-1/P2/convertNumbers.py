@@ -42,9 +42,14 @@ if __name__ == "__main__":
         for line in file:
             try:
                 num = int(line)
-                BINARY = to_binary(num)
-                HEXADECIMAL = to_hex(num)
-                CONVERSION_RESULTS += f"{num}   {BINARY}   {HEXADECIMAL}\n"
+                if num < 0:
+                    BINARY = to_binary(-num)
+                    HEXADECIMAL = to_hex(-num)
+                    CONVERSION_RESULTS += f"{num}   -{BINARY}   -{HEXADECIMAL}\n"
+                else:
+                    BINARY = to_binary(num)
+                    HEXADECIMAL = to_hex(num)
+                    CONVERSION_RESULTS += f"{num}   {BINARY}   {HEXADECIMAL}\n"
             except ValueError:
                 CONVERSION_RESULTS += f"{line}   #VALUE!   #VALUE!\n"
     elapsed_time = time.time() - start
