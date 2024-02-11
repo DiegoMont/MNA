@@ -1,5 +1,6 @@
 import json
 import sys
+import time
 
 
 class Product:
@@ -38,7 +39,8 @@ class Sale:
 
     def addPurchase(self, product: Product, quantity: int):
         if product not in self.purchased_products:
-            self.purchased_products[product.title] = ProductPurchase(product, quantity)
+            self.purchased_products[product.title] = ProductPurchase(
+                product, quantity)
         subtotal = product.price * quantity
         Sale.total_cost += subtotal
         self.total += subtotal
@@ -52,7 +54,11 @@ def load_products_file(file_path: str) -> dict[str, Product]:
         products[object["title"]] = Product(**object)
     return products
 
-def load_sales_file(file_path: str, products: dict[str, Product]) -> dict[int, Sale]:
+
+def load_sales_file(
+        file_path: str,
+        products: dict[str, Product]
+        ) -> dict[int, Sale]:
     sales = {}
     with open(file_path) as file:
         content = json.load(file)
@@ -60,12 +66,22 @@ def load_sales_file(file_path: str, products: dict[str, Product]) -> dict[int, S
         if purchase["SALE_ID"] not in sales:
             sales[purchase["SALE_ID"]] = Sale()
         sale = sales[purchase["SALE_ID"]]
-        purchased_product = products[purchase["Product"]]
-        quantity = purchase["Quantity"]
-        sale.addPurchase(purchased_product, quantity)
+        try:
+            purchased_product = products[purchase["Product"]]
+            quantity = purchase["Quantity"]
+            sale.addPurchase(purchased_product, quantity)
+        except KeyError:
+            print(f"No está registrado el producto {purchase['Product']}")
     return sales
 
+
 if __name__ == "__main__":
+    start = time.time()
     products = load_products_file(sys.argv[1])
     sales = load_sales_file(sys.argv[2], products)
-    print(Sale.total_cost)
+    elapsed_time = time.time() - start
+    output = f"Total cost: ${Sale.total_cost:.2f}\n"
+    output += f"EXECUTION TIME: {elapsed_time:10.3f}s"
+    print(output)
+    with open("SalesResults.txt", "w") as results_file:
+        results_file.write(output)
