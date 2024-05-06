@@ -50,22 +50,20 @@ def main():
 
 
 def get_angle_from_road_line(lines: np.ndarray) -> float:
-    angles = []
-    CAMERA_OFFSET = math.pi / 2
+    H_MID = 128 / 2
+    x1s, x2s = [], []
     for line in lines:
-        x1, y1, x2, y2 = line[0]
-        tan = (y2 - y1) / (x2 - x1)
-        angle = math.atan(tan)
-        if angle > 0:
-            angle -= CAMERA_OFFSET
-        elif angle < 0:
-            angle += CAMERA_OFFSET
-        print(angle * 180)
-        angles.append(angle)
-    if angles:
-        deviation_angle = -statistics.mean(angles)
-        return deviation_angle
-    return 0
+        line_height = abs(line[0][1] - line[0][3])
+        x1s.append(line[0][0] - H_MID)
+        x2s.append((line[0][2] - H_MID) / line_height)
+    x1 = statistics.mean(x1s)
+    x2 = statistics.mean(x2s)
+    try:
+        coeff = 0.005
+        angle = x1 * coeff
+        return angle
+    except ZeroDivisionError:
+        return 0
 
 
 def _filter_region_of_interest(img: np.ndarray):
