@@ -1,3 +1,6 @@
+# datasets
+data/
+
 # webots files
 /navegacion-autonoma/**/worlds
 
