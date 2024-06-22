@@ -1,5 +1,12 @@
 # datasets
 data/
+*.csv
+*.png
+
+# Deep Learning saved models
+*.keras
+*.h5
+*.pth
 
 # webots files
 /navegacion-autonoma/**/worlds
