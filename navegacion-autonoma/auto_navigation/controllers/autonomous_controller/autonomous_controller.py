@@ -3,8 +3,24 @@ os.environ["KERAS_BACKEND"] = "torch"
 import cv2
 import numpy as np
 from vehicle import Car, Driver
-from controller import Display, Camera
+from controller import Display
 import keras
+import torch
+from torch.nn import Linear
+from torchvision.models import resnet
+from torchvision.models.resnet import ResNet
+import torchvision.transforms.v2.functional as F
+
+def load_resnet_50(num_classes) -> ResNet:
+    model = resnet.resnet50()
+    model.fc = Linear(model.fc.in_features, num_classes)
+    return model
+
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+ped_detector = load_resnet_50(2)
+ped_detector.load_state_dict(torch.load("pedestrian_detector.pth"))
+ped_detector = ped_detector.to(device)
+ped_detector.eval()
 
 # Preprocess image for model prediction
 def preprocess_image(image):
@@ -66,10 +82,27 @@ def main():
         grey_image = cv2.cvtColor(preprocessed_image[0], cv2.COLOR_YUV2BGR)
         display_image(display_img, grey_image)
 
+        # Pedestrian detection
+        cruising_speed = 20
+        img = np.transpose(image, (2, 0, 1))
+        ped_input = torch.from_numpy(img).float()
+        ped_input = ped_input / 255
+        ped_input = F.resize(ped_input, [224, 224])
+        ped_input = torch.unsqueeze(ped_input, dim=0)
+        ped_input = ped_input.to(device)
+        with torch.no_grad():
+            prediction = ped_detector(ped_input)
+            prediction = prediction.cpu()
+            predicted_class = torch.max(prediction, 1).indices.item()
+        print(predicted_class)
+        if predicted_class == 0:
+            cruising_speed = 0
+            print('Pedestrian detected')
+
         # Update the steering angle and speed
         print(f"Steering angle: {steering_angle}")
         driver.setSteeringAngle(steering_angle)
-        driver.setCruisingSpeed(25)  # Set a constant speed for testing
+        driver.setCruisingSpeed(cruising_speed)  # Set a constant speed for testing
 
 if __name__ == "__main__":
     main()
